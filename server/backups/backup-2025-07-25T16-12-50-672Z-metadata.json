@@ -1,0 +1,16 @@
+{
+  "timestamp": "2025-07-25T16:12:51.036Z",
+  "dataCounts": {
+    "businesses_count": "1",
+    "products_count": "0",
+    "uploads_count": "0",
+    "faqs_count": "0"
+  },
+  "featureFlags": {
+    "ENABLE_GOOGLE_SHEETS": true,
+    "ENABLE_CSV_UPLOAD": true,
+    "ENABLE_CASCADE_DELETE": true,
+    "ENABLE_UPLOAD_ID_MIGRATION": false
+  },
+  "version": "1.0.0"
+}
