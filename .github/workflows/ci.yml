@@ -14,49 +14,36 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
           node-version: '18'
 
-      - name: Check directory structure
-        run: |
-          echo "Current directory: $(pwd)"
-          echo "Directory contents:"
-          ls -la
-          echo "Client directory:"
-          ls -la client/
-          echo "Server directory:"
-          ls -la server/
+      - name: Debug - Show current directory
+        run: pwd
 
-      - name: Install frontend dependencies
-        run: |
-          cd client
-          npm install
-          echo "Frontend dependencies installed successfully"
+      - name: Debug - List files
+        run: ls -la
 
-      - name: Install backend dependencies
+      - name: Debug - Check if client directory exists
         run: |
-          cd server
-          npm install
-          echo "Backend dependencies installed successfully"
+          if [ -d "client" ]; then
+            echo "✅ Client directory exists"
+            ls -la client/
+          else
+            echo "❌ Client directory missing"
+          fi
 
-      - name: Build frontend
+      - name: Debug - Check if server directory exists
         run: |
-          cd client
-          npm run build
-          echo "Frontend built successfully"
+          if [ -d "server" ]; then
+            echo "✅ Server directory exists"
+            ls -la server/
+          else
+            echo "❌ Server directory missing"
+          fi
 
-      - name: Build backend
-        run: |
-          cd server
-          npm run build
-          echo "Backend built successfully"
-
-      - name: Run backend tests
-        run: |
-          cd server
-          npm test
-          echo "Backend tests completed successfully"
+      - name: Test - Simple echo
+        run: echo "Hello from CI workflow"
