@@ -21,17 +21,42 @@ jobs:
         with:
           node-version: '18'
 
+      - name: Check directory structure
+        run: |
+          echo "Current directory: $(pwd)"
+          echo "Directory contents:"
+          ls -la
+          echo "Client directory:"
+          ls -la client/
+          echo "Server directory:"
+          ls -la server/
+
       - name: Install frontend dependencies
-        run: npm install --prefix client
+        run: |
+          cd client
+          npm install
+          echo "Frontend dependencies installed successfully"
 
       - name: Install backend dependencies
-        run: npm install --prefix server
+        run: |
+          cd server
+          npm install
+          echo "Backend dependencies installed successfully"
 
       - name: Build frontend
-        run: npm run build --prefix client
+        run: |
+          cd client
+          npm run build
+          echo "Frontend built successfully"
 
       - name: Build backend
-        run: npm run build --prefix server
+        run: |
+          cd server
+          npm run build
+          echo "Backend built successfully"
 
       - name: Run backend tests
-        run: npm test --prefix server
+        run: |
+          cd server
+          npm test
+          echo "Backend tests completed successfully"
