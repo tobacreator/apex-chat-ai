@@ -70,5 +70,10 @@ jobs:
           cd server
           npm test
 
+      - name: Run frontend tests
+        run: |
+          cd client
+          npm test
+
       - name: Test - Simple echo
         run: echo "✅ All builds and tests completed successfully!"
