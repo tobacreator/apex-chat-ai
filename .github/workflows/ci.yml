@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  build:
+  build-and-test:
     runs-on: ubuntu-latest
 
     steps:
@@ -45,5 +45,30 @@ jobs:
             echo "❌ Server directory missing"
           fi
 
+      - name: Install client dependencies
+        run: |
+          cd client
+          npm ci
+
+      - name: Build client
+        run: |
+          cd client
+          npm run build
+
+      - name: Install server dependencies
+        run: |
+          cd server
+          npm ci
+
+      - name: Build server
+        run: |
+          cd server
+          npm run build
+
+      - name: Run server tests
+        run: |
+          cd server
+          npm test
+
       - name: Test - Simple echo
-        run: echo "Hello from CI workflow"
+        run: echo "✅ All builds and tests completed successfully!"
