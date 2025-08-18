@@ -1,0 +1,11 @@
+name: staging
+url: https://staging.apexchatai.com
+protection_rules:
+  - required_reviewers:
+      - tobac
+  - wait_timer:
+      minutes: 5
+  - required_status_checks:
+      - "build-and-test"
+      - "security-checks"
+      - "database-check"

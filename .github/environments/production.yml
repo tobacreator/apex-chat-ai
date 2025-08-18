@@ -1,0 +1,12 @@
+name: production
+url: https://apexchatai.com
+protection_rules:
+  - required_reviewers:
+      - tobac
+  - wait_timer:
+      minutes: 10
+  - required_status_checks:
+      - "build-and-test"
+      - "security-checks"
+      - "database-check"
+      - "integration-tests"
