@@ -159,7 +159,7 @@ jobs:
     if: github.event.inputs.environment == 'staging' || (github.ref == 'refs/heads/main' && github.event_name == 'push')
     environment:
       name: staging
-      url: https://staging.apexchatai.com
+      url: http://localhost:3000
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -187,7 +187,7 @@ jobs:
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment:
       name: production
-      url: https://apexchatai.com
+      url: http://localhost:5000
     steps:
       - name: Download build artifacts
         uses: actions/download-artifact@v4

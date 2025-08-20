@@ -1,5 +1,5 @@
 name: production
-url: https://apexchatai.com
+url: http://localhost:5000
 protection_rules:
   - required_reviewers:
       - tobac

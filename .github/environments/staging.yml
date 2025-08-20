@@ -1,5 +1,5 @@
 name: staging
-url: https://staging.apexchatai.com
+url: http://localhost:3000
 protection_rules:
   - required_reviewers:
       - tobac
