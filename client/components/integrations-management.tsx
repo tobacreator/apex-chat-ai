@@ -658,19 +658,13 @@ export function IntegrationsManagement() {
             <IntegrationCard
               key={integration.id}
               integration={integration}
-              onConnect={() => {
+              onConnectClick={() => {
                 if (integration.id === 'google-sheets') {
                   if (integration.status === 'connected') {
                     setCurrentStep('select');
                   } else {
                     setCurrentStep('connect');
                   }
-                }
-                // Handle other integrations...
-              }}
-              onDisconnect={() => {
-                if (integration.id === 'google-sheets') {
-                  handleGoogleSheetsDisconnect();
                 }
                 // Handle other integrations...
               }}

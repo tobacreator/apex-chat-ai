@@ -16,8 +16,9 @@ export default function ForgotPasswordPage() {
     try {
       await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/reset-password`, { email });
       setMessage("Password reset email sent! Check your inbox.");
-    } catch (err: any) {
-      setError(err.response?.data?.error || "Failed to send reset email.");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to send reset email.";
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }

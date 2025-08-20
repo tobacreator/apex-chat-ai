@@ -1,0 +1,16 @@
+[1mdiff --git a/client/app/forgot-password/page.tsx b/client/app/forgot-password/page.tsx[m
+[1mindex bab3d0c..6511dc9 100644[m
+[1m--- a/client/app/forgot-password/page.tsx[m
+[1m+++ b/client/app/forgot-password/page.tsx[m
+[36m@@ -16,8 +16,9 @@[m [mexport default function ForgotPasswordPage() {[m
+     try {[m
+       await axios.post(`${process.env.NEXT_PUBLIC_API_BASE_URL}/auth/reset-password`, { email });[m
+       setMessage("Password reset email sent! Check your inbox.");[m
+[31m-    } catch (err: any) {[m
+[31m-      setError(err.response?.data?.error || "Failed to send reset email.");[m
+[32m+[m[32m    } catch (err: unknown) {[m
+[32m+[m[32m      const errorMessage = err instanceof Error ? err.message : "Failed to send reset email.";[m
+[32m+[m[32m      setError(errorMessage);[m
+     } finally {[m
+       setIsLoading(false);[m
+     }[m

@@ -2,11 +2,8 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Plus } from "lucide-react"
 import { FAQList } from "@/components/faq-list"
 import { BotTester } from "@/components/bot-tester"
 import { useFaq } from "@/lib/faq-context"
@@ -29,8 +26,9 @@ export function FAQManagement() {
       await addFaq({ question: newFAQ.question, answer: newFAQ.answer, category: newFAQ.category });
       setNewFAQ({ question: "", answer: "", category: "" });
       setIsAddingFAQ(false);
-    } catch (err: any) {
-      setFormError(typeof err === 'string' ? err : err.message || 'Failed to add FAQ');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to add FAQ';
+      setFormError(errorMessage);
     }
   }
 

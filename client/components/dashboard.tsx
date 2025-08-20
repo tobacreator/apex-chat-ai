@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { MetricCard } from "@/components/metric-card"
 import { ChartContainer } from "@/components/chart-container"
 import { MessageSquare, TrendingUp, Zap, Users } from "lucide-react"
-import type { LucideIcon } from "lucide-react" // Ensure this import is correct
 
 export function Dashboard() {
   const metrics = [

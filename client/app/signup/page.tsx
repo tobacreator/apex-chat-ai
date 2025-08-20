@@ -30,11 +30,12 @@ export default function SignupPage() {
       } else {
         setError("Signup failed. Please check your details and try again.");
       }
-    } catch (err: any) {
-      if (err.message === "Email already registered") {
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Signup failed. Please check your details and try again.";
+      if (errorMessage === "Email already registered") {
         setError("Email already registered");
       } else {
-        setError("Signup failed. Please check your details and try again.");
+        setError(errorMessage);
       }
     }
   };

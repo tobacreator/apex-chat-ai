@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { Suspense, useEffect } from "react"
 import { useAuth } from "@/lib/auth-context"
 import { useRouter, useSearchParams } from "next/navigation"
 import { SidebarProvider } from "@/components/ui/sidebar"
@@ -9,7 +9,7 @@ import { Dashboard } from "@/components/dashboard"
 import { FAQManagement } from "@/components/faq-management"
 import { IntegrationsManagement } from "@/components/integrations-management"
 
-export default function ApexChatPlatform() {
+function ApexChatPlatform() {
   const { user, isLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -64,5 +64,13 @@ export default function ApexChatPlatform() {
         </main>
       </div>
     </SidebarProvider>
+  )
+}
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center bg-gray-50"><div className="text-lg font-semibold text-gray-700">Loading...</div></div>}>
+      <ApexChatPlatform />
+    </Suspense>
   )
 }

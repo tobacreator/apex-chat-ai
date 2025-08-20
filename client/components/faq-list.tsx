@@ -36,8 +36,9 @@ export function FAQList() {
     try {
       await editFaq(id, editForm);
       setEditingId(null);
-    } catch (err: any) {
-      setFormError(typeof err === 'string' ? err : err.message || 'Failed to update FAQ');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update FAQ';
+      setFormError(errorMessage);
     }
   }
 
@@ -45,8 +46,9 @@ export function FAQList() {
     setFormError(null);
     try {
       await removeFaq(id);
-    } catch (err: any) {
-      setFormError(typeof err === 'string' ? err : err.message || 'Failed to delete FAQ');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to delete FAQ';
+      setFormError(errorMessage);
     }
   }
 

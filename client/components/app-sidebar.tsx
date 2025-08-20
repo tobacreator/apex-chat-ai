@@ -10,7 +10,6 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-  SidebarProvider, // Ensure SidebarProvider is available from this path if not globally provided
 } from "@/components/ui/sidebar" // Assumes shadcn/ui sidebar components are in this path
 import { useAuth } from "@/lib/auth-context"
 

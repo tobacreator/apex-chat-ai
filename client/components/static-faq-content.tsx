@@ -24,7 +24,7 @@ export default function StaticFaqContent() {
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
                 <CardTitle>Frequently Asked Questions</CardTitle>
-                <p className="text-sm text-gray-600 mt-1">Manage your AI's knowledge base and responses</p>
+                <p className="text-sm text-gray-600 mt-1">Manage your AI&apos;s knowledge base and responses</p>
               </div>
               {/* Button will be client-side */}
             </CardHeader>

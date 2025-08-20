@@ -2,7 +2,7 @@
 
 import React, { createContext, useState, useEffect, useContext, useCallback, ReactNode } from 'react';
 import axios from 'axios';
-import { FAQ, getFAQs, createFAQ, updateFAQ, deleteFAQ } from '../services/faqService';
+import { FAQ, createFAQ, updateFAQ, deleteFAQ } from '../services/faqService';
 import { useAuth } from './auth-context';
 
 interface FaqContextType {
@@ -56,10 +56,15 @@ export const FaqProvider = ({ children }: { children: ReactNode }) => {
         setFaqs([]); // Fallback to empty array
         setError("Backend returned unexpected data format for FAQs.");
       }
-    } catch (err: any) {
-      console.error('FaqContext: Error fetching FAQs:', err.message, err.response?.status, err.response?.data);
+    } catch (err: unknown) {
+      console.error('FaqContext: Error fetching FAQs:', err);
       setFaqs([]); // CRUCIAL: Ensure faqs is set to an empty array on error
-      setError(err.response?.data?.message || "Failed to load FAQs."); // Update error state
+      if (err && typeof err === 'object' && 'response' in err) {
+        const axiosError = err as { response?: { data?: { message?: string } } };
+        setError(axiosError.response?.data?.message || "Failed to load FAQs.");
+      } else {
+        setError("Failed to load FAQs.");
+      }
       // Optionally, if 401, you might want to trigger logout:
       // if (err.response?.status === 401) { logout(); }
     } finally {
@@ -74,8 +79,9 @@ export const FaqProvider = ({ children }: { children: ReactNode }) => {
     try {
       const newFaq = await createFAQ(faq, token);
       setFaqs((prev) => [newFaq, ...prev]);
-    } catch (err: any) {
-      setError(typeof err === 'string' ? err : err.message || 'Failed to create FAQ');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to create FAQ';
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -88,8 +94,9 @@ export const FaqProvider = ({ children }: { children: ReactNode }) => {
     try {
       const updated = await updateFAQ(id, faq, token);
       setFaqs((prev) => prev.map((f) => (f.id === id ? updated : f)));
-    } catch (err: any) {
-      setError(typeof err === 'string' ? err : err.message || 'Failed to update FAQ');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to update FAQ';
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -102,8 +109,9 @@ export const FaqProvider = ({ children }: { children: ReactNode }) => {
     try {
       await deleteFAQ(id, token);
       setFaqs((prev) => prev.filter((f) => f.id !== id));
-    } catch (err: any) {
-      setError(typeof err === 'string' ? err : err.message || 'Failed to delete FAQ');
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to delete FAQ';
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }

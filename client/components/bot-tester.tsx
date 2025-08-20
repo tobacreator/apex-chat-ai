@@ -70,9 +70,10 @@ export function BotTester() {
       };
       setTestResults([newTestResult, ...testResults]);
       setQuery("");
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error("Error calling AI backend:", error);
-      setAiError(error.response?.data?.message || "Failed to get AI response. Please try again.");
+      const errorMessage = error instanceof Error ? error.message : "Failed to get AI response. Please try again.";
+      setAiError(errorMessage);
     } finally {
       setIsLoadingAi(false);
     }

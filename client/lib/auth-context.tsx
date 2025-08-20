@@ -38,7 +38,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     if (savedToken) {
       console.log('AuthProvider useEffect: Token found in localStorage:', savedToken ? 'YES' : 'NO');
       try {
-        const decodedToken: any = jwtDecode(savedToken);
+        const decodedToken = jwtDecode(savedToken) as { exp: number };
         console.log('AuthProvider useEffect: Decoded token:', decodedToken);
         if (decodedToken.exp * 1000 < Date.now()) {
           console.log('AuthProvider useEffect: Token EXPIRED.');
@@ -78,27 +78,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
             throw new Error('Profile data missing from response.'); // Force error handling path
           }
           setIsLoading(false);
-        } catch (err: any) {
-          console.log('AuthProvider useEffect: Profile fetch failed (attempt', retryCount + 1, '):', err.response?.status, err.message);
-          
-          // Retry up to 3 times for network/server errors
-          if (retryCount < 3 && (err.response?.status === 404 || err.response?.status === 0 || !err.response)) {
-            console.log('AuthProvider useEffect: Retrying in 2 seconds...');
-            setTimeout(() => attemptAuth(retryCount + 1), 2000);
-            return;
-          }
-          
-          // Only logout if it's an authentication error (401, 403) or server error (5xx)
-          if (err.response?.status === 401 || err.response?.status === 403 || 
-              (err.response?.status >= 500 && err.response?.status < 600)) {
-            console.log('AuthProvider useEffect: Authentication error, logging out');
-            localStorage.removeItem("apexchat_jwt");
-            setUser(null);
-            setToken(null);
+        } catch (err: unknown) {
+          // Type guard for axios errors
+          if (err && typeof err === 'object' && 'response' in err) {
+            const axiosError = err as { response?: { status?: number }; message?: string };
+            console.log('AuthProvider useEffect: Profile fetch failed (attempt', retryCount + 1, '):', axiosError.response?.status, axiosError.message);
+            
+            // Retry up to 3 times for network/server errors
+            if (retryCount < 3 && (axiosError.response?.status === 404 || axiosError.response?.status === 0 || !axiosError.response?.status)) {
+              console.log('AuthProvider useEffect: Retrying in 2 seconds...');
+              setTimeout(() => attemptAuth(retryCount + 1), 2000);
+              return;
+            }
+            
+            // Only logout if it's an authentication error (401, 403) or server error (5xx)
+            if (axiosError.response?.status === 401 || axiosError.response?.status === 403 || 
+                (axiosError.response?.status && axiosError.response.status >= 500 && axiosError.response.status < 600)) {
+              console.log('AuthProvider useEffect: Authentication error, logging out');
+              localStorage.removeItem("apexchat_jwt");
+              setUser(null);
+              setToken(null);
+            } else {
+              console.log('AuthProvider useEffect: Network/server error, keeping token for retry');
+              // Keep the token but don't set user (will retry on next mount)
+              setToken(savedToken);
+            }
           } else {
-            console.log('AuthProvider useEffect: Network/server error, keeping token for retry');
-            // Keep the token but don't set user (will retry on next mount)
-            setToken(savedToken);
+            console.log('AuthProvider useEffect: Unknown error type:', err);
           }
           setIsLoading(false);
         }
@@ -131,7 +137,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       console.log('Login: AuthContext state set - user:', user ? user.email : 'null', 'token present:', !!session.access_token);
       setIsLoading(false);
       return true;
-    } catch (err) {
+    } catch {
       setUser(null);
       setToken(null);
       setIsLoading(false);
@@ -151,10 +157,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
       setIsLoading(false);
       return true;
-    } catch (err: any) {
+    } catch (err: unknown) {
       setIsLoading(false);
-      if (err.response?.data?.message?.includes("already been registered")) {
-        throw new Error("Email already registered");
+      if (err && typeof err === 'object' && 'response' in err) {
+        const axiosError = err as { response?: { data?: { message?: string } } };
+        if (axiosError.response?.data?.message?.includes("already been registered")) {
+          throw new Error("Email already registered");
+        }
       }
       return false;
     }

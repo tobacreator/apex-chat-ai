@@ -8,17 +8,26 @@
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
     "rootDir": "./src",
-
-    // Added below for alias support
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
     "baseUrl": "./src",
     "paths": {
       "@/components/*": ["components/*"],
       "@/lib/*": ["lib/*"],
       "@/hooks/*": ["hooks/*"],
       "@/services/*": ["services/*"],
-      "@/types/*": ["types/*"]
+      "@/types/*": ["types/*"],
+      "@/controllers/*": ["controllers/*"],
+      "@/middleware/*": ["middleware/*"],
+      "@/routes/*": ["routes/*"],
+      "@/utils/*": ["utils/*"],
+      "@/config/*": ["config/*"],
+      "@/db/*": ["db/*"]
     }
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules"]
+  "exclude": ["node_modules", "dist", "**/*.test.ts", "**/*.spec.ts"]
 }

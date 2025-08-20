@@ -21,6 +21,14 @@ interface UploadedFile {
   validationErrors?: Array<{row: number, field: string, error: string}>
 }
 
+interface UploadResponse {
+  id: string
+  filename: string
+  status: string
+  file_type: string
+  uploaded_at: string
+}
+
 export function CSVUploader() {
   const { token } = useAuth()
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
@@ -65,7 +73,7 @@ export function CSVUploader() {
           }
         );
         
-        const historyFiles = response.data.uploads.map((upload: any) => ({
+        const historyFiles = response.data.uploads.map((upload: UploadResponse) => ({
           id: upload.id,
           name: upload.filename,
           status: upload.status === 'partial' ? "completed" : upload.status as "completed",
@@ -210,7 +218,7 @@ export function CSVUploader() {
         }
       );
       
-      const updatedHistoryFiles = historyResponse.data.uploads.map((upload: any) => ({
+      const updatedHistoryFiles = historyResponse.data.uploads.map((upload: UploadResponse) => ({
         id: upload.id,
         name: upload.filename,
         status: upload.status === 'partial' ? "completed" : upload.status as "completed",
@@ -225,38 +233,45 @@ export function CSVUploader() {
       // Reset file input
       setFileInputKey(prev => prev + 1);
       
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('CSV Upload: Error occurred:', err);
-      console.error('CSV Upload: Error response:', err.response?.data);
       
-      // Handle validation errors (400 status)
-      if (err.response?.status === 400) {
-        const validationErrors = err.response.data.errors;
-        if (validationErrors && Array.isArray(validationErrors)) {
-          // Create a simple error message for users
-          const errorCount = validationErrors.length;
-          const sampleErrors = validationErrors.slice(0, 3);
-          let errorMessage = `Found ${errorCount} errors in your CSV file.\n\n`;
-          errorMessage += `First few errors:\n`;
-          sampleErrors.forEach(error => {
-            errorMessage += `• Row ${error.row}: ${error.field} - ${error.error}\n`;
-          });
-          if (errorCount > 3) {
-            errorMessage += `\n... and ${errorCount - 3} more errors.\n\n`;
+      // Type guard for axios errors
+      if (err && typeof err === 'object' && 'response' in err) {
+        const axiosError = err as { response?: { status?: number; data?: { errors?: Array<{ row: number; field: string; error: string }>; message?: string } } };
+        console.error('CSV Upload: Error response:', axiosError.response?.data);
+        
+        // Handle validation errors (400 status)
+        if (axiosError.response?.status === 400) {
+          const validationErrors = axiosError.response.data?.errors;
+          if (validationErrors && Array.isArray(validationErrors)) {
+            // Create a simple error message for users
+            const errorCount = validationErrors.length;
+            const sampleErrors = validationErrors.slice(0, 3);
+            let errorMessage = `Found ${errorCount} errors in your CSV file.\n\n`;
+            errorMessage += `First few errors:\n`;
+            sampleErrors.forEach((error: { row: number; field: string; error: string }) => {
+              errorMessage += `• Row ${error.row}: ${error.field} - ${error.error}\n`;
+            });
+            if (errorCount > 3) {
+              errorMessage += `\n... and ${errorCount - 3} more errors.\n\n`;
+            }
+            errorMessage += `💡 Tip: Download the template for ${detectedType} to see the correct format.`;
+            
+            alert(errorMessage);
+          } else {
+            alert(axiosError.response.data?.message || 'Validation failed. Please check your CSV file.');
           }
-          errorMessage += `💡 Tip: Download the template for ${detectedType} to see the correct format.`;
-          
-          alert(errorMessage);
-        } else {
-          alert(err.response.data.message || 'Validation failed. Please check your CSV file.');
         }
-      }
-      // Handle duplicate file error
-      else if (err.response?.status === 409) {
-        alert('This file has already been uploaded. Please use a different filename or delete the existing upload first.');
-      }
-      // Handle other errors
-      else {
+        // Handle duplicate file error
+        else if (axiosError.response?.status === 409) {
+          alert('This file has already been uploaded. Please use a different filename or delete the existing upload first.');
+        }
+        // Handle other errors
+        else {
+          alert('Upload failed. Please check your file format and try again.');
+        }
+      } else {
         alert('Upload failed. Please check your file format and try again.');
       }
       
