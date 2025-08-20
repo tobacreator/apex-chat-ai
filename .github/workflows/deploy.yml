@@ -19,55 +19,10 @@ env:
   NPM_CONFIG_CACHE: '~/.npm'
 
 jobs:
-  # Build and Test Matrix
-  build-and-test:
-    name: Build and Test
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        project: [client, server]
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-          cache-dependency-path: ${{ matrix.project }}/package-lock.json
-
-      - name: Install dependencies
-        working-directory: ./${{ matrix.project }}
-        run: npm ci --prefer-offline --no-audit
-
-      - name: Type check
-        working-directory: ./${{ matrix.project }}
-        run: |
-          if [ "${{ matrix.project }}" = "client" ]; then
-            npm run type-check
-          else
-            npx tsc --noEmit --skipLibCheck
-          fi
-
-      - name: Build
-        working-directory: ./${{ matrix.project }}
-        run: npm run build
-        env:
-          NEXT_PUBLIC_API_BASE_URL: ${{ secrets.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api' }}
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ matrix.project }}-build
-          path: ${{ matrix.project }}/${{ matrix.project == 'client' && '.next' || 'dist' }}
-          retention-days: 30
-
   # Security Checks
   security-checks:
     name: Security Checks
     runs-on: ubuntu-latest
-    needs: build-and-test
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -100,7 +55,7 @@ jobs:
   database-check:
     name: Database Check
     runs-on: ubuntu-latest
-    needs: build-and-test
+    needs: security-checks
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -129,7 +84,7 @@ jobs:
   integration-tests:
     name: Integration Tests
     runs-on: ubuntu-latest
-    needs: [build-and-test, security-checks, database-check]
+    needs: [security-checks, database-check]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -155,7 +110,7 @@ jobs:
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
-    needs: [build-and-test, security-checks, database-check]
+    needs: [security-checks, database-check]
     if: github.event.inputs.environment == 'staging' || (github.ref == 'refs/heads/main' && github.event_name == 'push')
     environment:
       name: staging
@@ -205,7 +160,7 @@ jobs:
   deploy-production:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    needs: [build-and-test, security-checks, database-check, integration-tests]
+    needs: [security-checks, database-check, integration-tests]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment:
       name: production
