@@ -47,13 +47,17 @@ jobs:
         working-directory: ./client
         run: |
           echo "🔍 Checking client build output..."
+          echo "Current working directory: $(pwd)"
+          echo "Directory contents:"
+          ls -la
           if [ -d ".next" ]; then
             echo "✅ .next directory found"
             ls -la .next/
             echo "Build size: $(du -sh .next/)"
           else
             echo "❌ .next directory not found"
-            ls -la
+            echo "Available directories:"
+            find . -type d -maxdepth 2
             exit 1
           fi
 
@@ -71,7 +75,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: client-build
-          path: client/.next
+          path: .next
           retention-days: 7
 
   # Server Build and Test
@@ -114,7 +118,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: server-build
-          path: server/dist
+          path: dist
           retention-days: 7
 
   # Security and Quality Checks
