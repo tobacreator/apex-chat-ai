@@ -51,11 +51,71 @@ jobs:
           cd ../server && npm audit --audit-level=high || echo "❌ High severity vulnerabilities found in server"
         continue-on-error: true
 
+  # Client Build
+  build-client:
+    name: Build and Test (client)
+    runs-on: ubuntu-latest
+    needs: security-checks
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install client dependencies
+        working-directory: ./client
+        run: npm ci --prefer-offline --no-audit
+
+      - name: Build client
+        working-directory: ./client
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_BASE_URL: ${{ secrets.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:5000/api' }}
+
+      - name: Upload client build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: client-build
+          path: client/.next
+          retention-days: 30
+
+  # Server Build  
+  build-server:
+    name: Build and Test (server)
+    runs-on: ubuntu-latest
+    needs: security-checks
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: Install server dependencies
+        working-directory: ./server
+        run: npm ci --prefer-offline --no-audit
+
+      - name: Build server
+        working-directory: ./server
+        run: npm run build
+
+      - name: Upload server artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: server-build
+          path: server/dist
+          retention-days: 30
+
   # Database Check
   database-check:
     name: Database Check
     runs-on: ubuntu-latest
-    needs: security-checks
+    needs: [security-checks, build-client, build-server]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -84,7 +144,7 @@ jobs:
   integration-tests:
     name: Integration Tests
     runs-on: ubuntu-latest
-    needs: [security-checks, database-check]
+    needs: [security-checks, database-check, build-client, build-server]
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -110,7 +170,7 @@ jobs:
   deploy-staging:
     name: Deploy to Staging
     runs-on: ubuntu-latest
-    needs: [security-checks, database-check]
+    needs: [security-checks, database-check, build-client, build-server]
     if: github.event.inputs.environment == 'staging' || (github.ref == 'refs/heads/main' && github.event_name == 'push')
     environment:
       name: staging
@@ -160,7 +220,7 @@ jobs:
   deploy-production:
     name: Deploy to Production
     runs-on: ubuntu-latest
-    needs: [security-checks, database-check, integration-tests]
+    needs: [security-checks, database-check, integration-tests, build-client, build-server]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     environment:
       name: production
