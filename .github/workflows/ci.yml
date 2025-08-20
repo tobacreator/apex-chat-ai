@@ -207,3 +207,9 @@ jobs:
           # Add your integration test commands here
           echo "✅ Integration tests completed"
         continue-on-error: true
+
+# Updated CI workflow - $(Get-Date)
+# Fixed artifact upload paths:
+# - Client: .next (was client/.next)
+# - Server: dist (was server/dist)
+# This ensures artifacts are properly created and uploaded
