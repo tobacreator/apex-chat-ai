@@ -43,6 +43,28 @@ jobs:
         env:
           NEXT_PUBLIC_API_BASE_URL: http://localhost:5000/api
 
+      - name: Debug build output location
+        working-directory: ./client
+        run: |
+          echo "🔍 DEBUGGING BUILD OUTPUT LOCATION"
+          echo "Current working directory: $(pwd)"
+          echo "Full directory listing:"
+          ls -la
+          echo ""
+          echo "Looking for .next directory:"
+          if [ -d ".next" ]; then
+            echo "✅ .next directory found!"
+            ls -la .next/
+            echo "Build size: $(du -sh .next/)"
+          else
+            echo "❌ .next directory NOT found"
+            echo "Available directories:"
+            find . -type d -maxdepth 2
+          fi
+          echo ""
+          echo "Looking for any build-related directories:"
+          find . -name "*.next*" -o -name "dist*" -o -name "build*" -o -name "out*" 2>/dev/null || echo "No build directories found"
+
       - name: Verify client build output
         working-directory: ./client
         run: |
