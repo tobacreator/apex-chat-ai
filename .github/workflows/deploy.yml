@@ -161,7 +161,10 @@ jobs:
       name: staging
       url: http://localhost:3000
     steps:
-      - name: Download build artifacts
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download client build artifacts
         uses: actions/download-artifact@v4
         with:
           name: client-build
@@ -172,6 +175,25 @@ jobs:
         with:
           name: server-build
           path: server-build
+
+      - name: Verify artifacts
+        run: |
+          echo "🔍 Verifying downloaded artifacts..."
+          if [ -d "client-build" ]; then
+            echo "✅ Client build artifacts found"
+            ls -la client-build/
+          else
+            echo "❌ Client build artifacts missing"
+            exit 1
+          fi
+          
+          if [ -d "server-build" ]; then
+            echo "✅ Server build artifacts found"
+            ls -la server-build/
+          else
+            echo "❌ Server build artifacts missing"
+            exit 1
+          fi
 
       - name: Deploy to staging
         run: |
@@ -189,7 +211,10 @@ jobs:
       name: production
       url: http://localhost:5000
     steps:
-      - name: Download build artifacts
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download client build artifacts
         uses: actions/download-artifact@v4
         with:
           name: client-build
@@ -200,6 +225,25 @@ jobs:
         with:
           name: server-build
           path: server-build
+
+      - name: Verify artifacts
+        run: |
+          echo "🔍 Verifying downloaded artifacts..."
+          if [ -d "client-build" ]; then
+            echo "✅ Client build artifacts found"
+            ls -la client-build/
+          else
+            echo "❌ Client build artifacts missing"
+            exit 1
+          fi
+          
+          if [ -d "server-build" ]; then
+            echo "✅ Server build artifacts found"
+            ls -la server-build/
+          else
+            echo "❌ Server build artifacts missing"
+            exit 1
+          fi
 
       - name: Deploy to production
         run: |

@@ -15,17 +15,13 @@
     "sourceMap": true,
     "baseUrl": "./src",
     "paths": {
-      "@/components/*": ["components/*"],
-      "@/lib/*": ["lib/*"],
-      "@/hooks/*": ["hooks/*"],
-      "@/services/*": ["services/*"],
-      "@/types/*": ["types/*"],
       "@/controllers/*": ["controllers/*"],
-      "@/middleware/*": ["middleware/*"],
+      "@/db/*": ["db/*"],
       "@/routes/*": ["routes/*"],
       "@/utils/*": ["utils/*"],
       "@/config/*": ["config/*"],
-      "@/db/*": ["db/*"]
+      "@/middleware/*": ["middleware/*"],
+      "@/models/*": ["models/*"]
     }
   },
   "include": ["src/**/*.ts"],

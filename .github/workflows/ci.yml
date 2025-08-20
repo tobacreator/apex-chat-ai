@@ -43,6 +43,20 @@ jobs:
         env:
           NEXT_PUBLIC_API_BASE_URL: http://localhost:5000/api
 
+      - name: Verify client build output
+        working-directory: ./client
+        run: |
+          echo "🔍 Checking client build output..."
+          if [ -d ".next" ]; then
+            echo "✅ .next directory found"
+            ls -la .next/
+            echo "Build size: $(du -sh .next/)"
+          else
+            echo "❌ .next directory not found"
+            ls -la
+            exit 1
+          fi
+
       - name: Run client tests (if available)
         working-directory: ./client
         run: |
