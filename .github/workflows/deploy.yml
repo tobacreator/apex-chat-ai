@@ -71,9 +71,9 @@ jobs:
         with:
           name: client-build
           path: |
-            client/.next
-            client/dist
-            client/build
+            .next
+            dist
+            build
           if-no-files-found: warn
           retention-days: 30
 
@@ -123,8 +123,8 @@ jobs:
         with:
           name: server-build
           path: |
-            server/dist
-            server/build
+            dist
+            build
           if-no-files-found: warn
           retention-days: 30
 
